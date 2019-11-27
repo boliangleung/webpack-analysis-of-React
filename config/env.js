@@ -1,6 +1,3 @@
-// Grab NODE_ENV and REACT_APP_* environment variables and prepare them to be
-// injected into the application via DefinePlugin in Webpack configuration.
-
 //获取NODE-ENV和REACT_APP_*环境变量，并准备通过Webpack配置中的DefinePlugin将它们注入到应用程序中。
 var REACT_APP = /^REACT_APP_/i
 

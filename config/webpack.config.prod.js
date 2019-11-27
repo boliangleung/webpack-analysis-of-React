@@ -1,38 +1,43 @@
 var autoprefixer = require('autoprefixer')
 var webpack = require('webpack')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var ExtractTextPlugin = require('extract-text-webpack-plugin') //提取文本网页包插件
-var ManifestPlugin = require('webpack-manifest-plugin')
-var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
+var ExtractTextPlugin = require('extract-text-webpack-plugin') // 注意：在webpack4中，建议用mini-css-extract-plugin代替
+var ManifestPlugin = require('webpack-manifest-plugin') //生成一份资源清单的json文件
+var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin') //这个WebPACK插件让我们将自定义变量插入到indexx.html中。它通过事件与HtmlWebpackPlugin 2.x协同工作
 var paths = require('./paths')
 var getClientEnvironment = require('./env')
 
-// Webpack uses `publicPath` to determine where the app is being served from.
-// It requires a trailing slash, or the file assets will get an incorrect path.
+// Webpack uses `publicPath` to determine where the app is being served from.  Webpack使用“publicPath”来确定从何处提供应用程序。
+// It requires a trailing slash, or the file assets will get an incorrect path.  它需要一个尾随斜杠，否则文件资源将得到一个不正确的路径
 var publicPath = paths.servedPath
-// Some apps do not use client-side routing with pushState.
+// Some apps do not use client-side routing with pushState.    //有些应用不使用pushState客户端路由。对于这些应用，“homepage”可以设置为“.”以启用相对asset路径。
 // For these, "homepage" can be set to "." to enable relative asset paths.
 var shouldUseRelativeAssetPaths = publicPath === './'
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
+// dev.js有解释
+
 var publicUrl = publicPath.slice(0, -1)
 // Get environment variables to inject into our app.
 var env = getClientEnvironment(publicUrl)
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
+// 如果这个NODE_ENV不是生产环境 将不打包
 if (env.stringified['process.env'].NODE_ENV !== '"production"') {
   throw new Error('Production builds must have NODE_ENV=production.')
 }
 
-// Note: defined here because it will be used more than once.
+// Note: defined here because it will be used more than once.    此处定义，因为它将被多次使用。
 const cssFilename = 'static/css/[name].[contenthash:8].css'
 
-// ExtractTextPlugin expects the build output to be flat.
+// ExtractTextPlugin expects the build output to be flat.   ExtractTextPlugin要求生成输出为平面
 // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
 // However, our output is structured with css, js and media folders.
 // To have this structure working with relative paths, we have to use custom options.
+
+// 插件的用法 webpack4.0官方现在已经不推荐这个插件了
 const extractTextPluginOptions = shouldUseRelativeAssetPaths
   ? // Making sure that the publicPath goes back to to build folder.
     { publicPath: Array(cssFilename.split('/').length).join('../') }
@@ -44,8 +49,8 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
 module.exports = {
   // Don't attempt to continue if there are any errors.
   bail: true,
-  // We generate sourcemaps in production. This is slow but gives good results.   我们在生产中生成源映射。这个过程很慢，但效果很好。
-  // You can exclude the *.map files from the build during deployment.  您可以在部署期间从生成中排除*.map文件
+  // We generate sourcemaps in production. This is slow but gives good results.   我们在生产中生成源映射。这个过程很慢，但效果很好。  补充：webpack官方 推荐使用cheap-module-soure-map
+  // You can exclude the *.map files from the build during deployment.            您可以在部署期间从生成中排除*.map文件
   devtool: 'source-map',
   // In production, we only want to load the polyfills and the app code.   在生产中，我们只想加载polyfill和应用程序代码。
   entry: [require.resolve('./polyfills'), paths.appIndexJs],
@@ -53,11 +58,13 @@ module.exports = {
     // The build folder.
     path: paths.appBuild,
     // Generated JS file names (with nested folders).
-    // There will be one main bundle, and one file per asynchronous chunk.
-    // We don't currently advertise code splitting but Webpack supports it.
+    // There will be one main bundle, and one file per asynchronous chunk.   每个异步块将有一个主包和一个文件。
+    // We don't currently advertise code splitting but Webpack supports it.     我们目前不宣传代码拆分，但Webpack支持它.
+    // 补充：实际上拆分是好的，因为异步模块es module 会让我们加载页面的时候。性能得到提升
     filename: 'static/js/[name].[chunkhash:8].js',
     chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
     // We inferred the "public path" (such as / or /my-project) from homepage.
+    // 我们从主页推断出“公共路径”（例如/或/我的项目）
     publicPath: publicPath
   },
   resolve: {
