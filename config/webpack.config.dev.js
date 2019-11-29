@@ -139,9 +139,9 @@ module.exports = {
         include: paths.appSrc,
         loader: 'babel',
         query: {
-          // This is a feature of `babel-loader` for webpack (not Babel itself).
-          // It enables caching results in ./node_modules/.cache/babel-loader/
-          // directory for faster rebuilds.
+          // This is a feature of `babel-loader` for webpack (not Babel itself).  这是webpack的“babel loader”特性（不是babel本身）
+          // It enables caching results in ./node_modules/.cache/babel-loader/      它在./node_modules/.cache/babel loader中启用缓存结果/
+          // directory for faster rebuilds.      快速重建目录。
           cacheDirectory: true
         }
       },
